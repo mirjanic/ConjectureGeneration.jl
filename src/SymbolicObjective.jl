@@ -17,13 +17,13 @@ Contains auxiliary data needed to evaluate signum loss.
 """
 struct SymbolicObjective <: Function
   requiredOps::AbstractVector{Tuple{Integer,Integer}}
-  loss_function::Loss
+  lossFunction::Loss
   complexityWeight::Real
   unusedFunctionPenalty::Real
 end
 
-function SymbolicObjective(requiredOps, loss_function; complexityWeight=0, unusedFunctionPenalty=1e5)
-  return SymbolicObjective(requiredOps, loss_function, complexityWeight, unusedFunctionPenalty)
+function SymbolicObjective(lossFunction; requiredOps=[], complexityWeight=0, unusedFunctionPenalty=1e5)
+  return SymbolicObjective(requiredOps, lossFunction, complexityWeight, unusedFunctionPenalty)
 end
 
 
@@ -60,6 +60,6 @@ function (objective::SymbolicObjective)(tree, dataset::Dataset{T,L}, options, id
   end
 
   # Loss
-  loss = mean(objective.loss_function, y_pred, y) + 1 / complexity * objective.complexityWeight
+  loss = mean(objective.lossFunction, y_pred, y) + 1 / complexity * objective.complexityWeight
   return L(loss)
 end

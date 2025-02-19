@@ -2,6 +2,7 @@ module HelperFunctions
 
 using PyCall
 using Combinatorics
+using Primes
 
 function eulerTotient(n::Integer)::Integer
   result = n
@@ -30,5 +31,9 @@ prime(n::Integer)::Integer = pyimport("sympy").ntheory.generate.prime(n)
 primeOmega(n::Integer)::Integer = pyimport("sympy").ntheory.factor_.primeomega(n)
 
 primorial(n) = Combinatorics.primorial(n)
+
+eulerSigma(n::Integer)::Integer = sum(Primes.divisors(n))
+
+safelog(x) = x > 1 ? log(x) : convert(typeof(x), 0)
 
 end

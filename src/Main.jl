@@ -1,4 +1,7 @@
-import SymbolicRegression: SRRegressor
+# import SymbolicRegression: SRRegressor, @template_spec
+using SymbolicRegression
+using SymbolicRegression.ComposableExpressionModule: apply_operator
+using SymbolicRegression.TemplateExpressionMacroModule: template_spec
 import MLJ: machine, fit!, predict, report
 import Combinatorics
 import Primes
@@ -8,36 +11,42 @@ using .ConjectureGeneration: SymbolicObjective, SignumLoss, Domain, wrap, Hyperb
 
 
 N = 100
-X = (x=Vector{Float32}(rand(1:100, N)),)
-# y = zeros(Float32, N)
+x = Vector{Int64}(rand(2:100, N))
 
-target_func(x) = exp(Base.MathConstants.γ) * x * log(log(x)) - sum(Primes.divisors(x))
-y = target_func.(ceil.(Int32, X.x))
+Xdata = (x=Float64.(x),)
 
-# loss = SymbolicObjective([(1, 1), (1, 2), (1, 3), (2, 1), (2, 2)], SignumLoss())
-loss = SymbolicObjective([], HyperbolicLoss())
-dom = Domain{Int32}(1, 100, ceil)
+target_func(x) = exp(Base.MathConstants.γ) * x * log(log(x)) - FnBox.eulerSigma(x)
+y = target_func.(x)
+
+loss = SymbolicObjective(HyperbolicLoss())
+dom = Domain{Int32}(1, 1000, ceil)
+
+# Define Expression Constraint
+template =  @template_spec(expressions=(f, g)) do x
+  f(x) + g(x)
+end
 
 
 model = SRRegressor(
   populations=32,
-  # niterations=1000,
+  niterations=1000,
   ncycles_per_iteration=1000,
   # warmup_maxsize_by=0.2,
   # maxsize=20,
-  binary_operators=[+, *
+  binary_operators=[+, *,
   # binary_operators=[FnBox.op, +, *, /,
   ],  # <---- functions go here
-  unary_operators=[exp, wrap(FnBox.eulerTotient, dom)
+  unary_operators=[exp, FnBox.safelog, wrap(FnBox.eulerSigma, dom)
   # unary_operators=[wrap(Combinatorics.primorial, dom), wrap(FnBox.eulerTotient, dom), wrap(FnBox.primeOmega, dom), cos, exp
   ],  # <---- or here
-  complexity_of_constants=1000,
+  complexity_of_constants=4,
   # should_simplify=true,
   # progress=true,
   loss_function=loss,
   # parsimony=1e-2,
+  expression_spec=template
 )
-mach = machine(model, X, y)
+mach = machine(model, Xdata, y)
 
 fit!(mach)
 
