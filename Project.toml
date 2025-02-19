@@ -1,7 +1,7 @@
 name = "ConjectureGeneration"
 uuid = "9c7ab011-c03f-42df-98ff-5bf3b392f95b"
 authors = ["ViktorMirjanic <vvm22@cam.ac.uk>", "DaattavyaAggarwal "]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
