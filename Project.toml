@@ -4,8 +4,10 @@ authors = ["ViktorMirjanic <vvm22@cam.ac.uk>", "DaattavyaAggarwal "]
 version = "0.2.0"
 
 [deps]
+Bumper = "8ce10254-0962-460f-a3d8-1f77fea1446e"
 Combinatorics = "861a8166-3701-5b0c-9a16-15d98fcdc6aa"
 DynamicExpressions = "a40a106e-89c9-4ca8-8020-a735e8728b6b"
+LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
 LossFunctions = "30fc2ffe-d236-52d8-8643-a9d8f7c094a7"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 Primes = "27ebfcd6-29c5-5fa9-bf4b-fb8fc14df3ae"
@@ -15,4 +17,3 @@ SymPy = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
 SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 
 [compat]
-Primes = "0.5.6"

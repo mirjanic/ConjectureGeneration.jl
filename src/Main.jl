@@ -1,4 +1,6 @@
 # import SymbolicRegression: SRRegressor, @template_spec
+using LoopVectorization
+using Bumper
 using SymbolicRegression
 using SymbolicRegression.ComposableExpressionModule: apply_operator
 using SymbolicRegression.TemplateExpressionMacroModule: template_spec
@@ -22,7 +24,7 @@ loss = SymbolicObjective(HyperbolicLoss())
 dom = Domain{Int32}(1, 1000, ceil)
 
 # Define Expression Constraint
-template =  @template_spec(expressions=(f, g)) do x
+template = @template_spec(expressions = (f, g)) do x
   f(x) + g(x)
 end
 
@@ -34,17 +36,21 @@ model = SRRegressor(
   # warmup_maxsize_by=0.2,
   # maxsize=20,
   binary_operators=[+, *,
-  # binary_operators=[FnBox.op, +, *, /,
+    # binary_operators=[FnBox.op, +, *, /,
   ],  # <---- functions go here
-  unary_operators=[exp, FnBox.safelog, wrap(FnBox.eulerSigma, dom)
-  # unary_operators=[wrap(Combinatorics.primorial, dom), wrap(FnBox.eulerTotient, dom), wrap(FnBox.primeOmega, dom), cos, exp
+  unary_operators=[
+    exp,
+    FnBox.safelog,
+    wrap(FnBox.eulerSigma, dom)
+    # unary_operators=[wrap(Combinatorics.primorial, dom), wrap(FnBox.eulerTotient, dom), wrap(FnBox.primeOmega, dom), cos, exp
   ],  # <---- or here
   complexity_of_constants=4,
-  # should_simplify=true,
-  # progress=true,
   loss_function=loss,
   # parsimony=1e-2,
-  expression_spec=template
+  expression_spec=template,
+  turbo=true,
+  bumper=true,
+  should_simplify=true
 )
 mach = machine(model, Xdata, y)
 
