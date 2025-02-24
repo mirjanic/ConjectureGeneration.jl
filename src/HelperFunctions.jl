@@ -34,6 +34,8 @@ primorial(n) = Combinatorics.primorial(n)
 
 eulerSigma(n::Integer)::Integer = sum(Primes.divisors(n))
 
+harmonic(x::Integer)::Real = sum(1 ./ range(1, x))
+
 safelog(x) = x > 1 ? log(x) : convert(typeof(x), 0)
 
 end

@@ -13,19 +13,19 @@ using .ConjectureGeneration: SymbolicObjective, SignumLoss, Domain, wrap, Hyperb
 
 
 N = 100
-x = Vector{Int64}(rand(2:100, N))
+x = Vector{Int64}(rand(2:500, N))
 
 Xdata = (x=Float64.(x),)
 
-target_func(x) = exp(Base.MathConstants.γ) * x * log(log(x)) - FnBox.eulerSigma(x)
+target_func(x) = exp(Base.MathConstants.γ) * x * log(log(x)) - FnBox.eulerSigma(x) + 0.1 * randn()
 y = target_func.(x)
 
 loss = SymbolicObjective(HyperbolicLoss())
 dom = Domain{Int32}(1, 1000, ceil)
 
 # Define Expression Constraint
-template = @template_spec(expressions = (f, g)) do x
-  f(x) + g(x)
+template = @template_spec(expressions = (f, g, h)) do x
+  -f(x) + exp(g(x)) * log(g(x)) * h(x)
 end
 
 
@@ -39,12 +39,14 @@ model = SRRegressor(
     # binary_operators=[FnBox.op, +, *, /,
   ],  # <---- functions go here
   unary_operators=[
-    exp,
-    FnBox.safelog,
-    wrap(FnBox.eulerSigma, dom)
+    exp, log, -,
+    # FnBox.safelog,
+    wrap(FnBox.eulerSigma, dom),
+    wrap(FnBox.harmonic, dom),
     # unary_operators=[wrap(Combinatorics.primorial, dom), wrap(FnBox.eulerTotient, dom), wrap(FnBox.primeOmega, dom), cos, exp
   ],  # <---- or here
   complexity_of_constants=4,
+  complexity_of_operators=[log => 4],
   loss_function=loss,
   # parsimony=1e-2,
   expression_spec=template,
